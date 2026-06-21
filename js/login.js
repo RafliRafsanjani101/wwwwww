@@ -1,103 +1,76 @@
-const form = document.getElementById("loginForm");
+// js/login.js
 
-const usernameInput =
-    document.getElementById("username");
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("loginForm");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const loginError = document.getElementById("loginError");
+    const loginSuccess = document.getElementById("loginSuccess");
 
-const passwordInput =
-    document.getElementById("password");
+    if (!form) return;
 
-const loginError =
-    document.getElementById("loginError");
+    form.addEventListener("submit", function (e) {
+        e.preventDefault(); // Mencegah halaman reload secara default
 
-const loginSuccess =
-    document.getElementById("loginSuccess");
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
 
-form.addEventListener("submit", function (e) {
+        // Reset status tampilan error/sukses dan validasi bootstrap
+        loginError.classList.add("d-none");
+        loginSuccess.classList.add("d-none");
+        usernameInput.classList.remove("is-invalid");
+        passwordInput.classList.remove("is-invalid");
 
-    e.preventDefault();
-
-    const username =
-        usernameInput.value.trim();
-
-    const password =
-        passwordInput.value.trim();
-
-    loginError.classList.add("d-none");
-    loginSuccess.classList.add("d-none");
-
-    usernameInput.classList.remove("is-invalid");
-    passwordInput.classList.remove("is-invalid");
-
-    // ADMIN
-
-    if (
-        username === "admin" &&
-        password === "admin123"
-    ) {
-
-        loginSuccess.classList.remove("d-none");
-
-        setTimeout(() => {
-
-            window.location.href =
-            "admin/dashboard-admin.html";
-
-        }, 1000);
-
-        return;
-    }
-
-    // ANGGOTA
-
-    if (
-        username === "anggota" &&
-        password === "anggota123"
-    ) {
-
-        loginSuccess.classList.remove("d-none");
-
-        setTimeout(() => {
-
-            window.location.href =
-            "anggota/dashboard-anggota.html";
-
-        }, 1000);
-
-        return;
-    }
-
-    // LOGIN GAGAL
-
-    loginError.classList.remove("d-none");
-
-    usernameInput.classList.add("is-invalid");
-    passwordInput.classList.add("is-invalid");
-
+        // Kirim data login ke API Backend Node.js
+        fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Jika login sukses, tampilkan alert sukses
+                loginSuccess.classList.remove("d-none");
+                
+                // Redirect ke dashboard sesuai dengan role dari database/backend
+                setTimeout(() => {
+                    if (data.role === 'admin') {
+                        window.location.href = "admin/dashboard-admin.html";
+                    } else if (data.role === 'anggota') {
+                        window.location.href = "anggota/dashboard-anggota.html";
+                    }
+                }, 1000);
+            } else {
+                // Jika login gagal, tampilkan alert error dan beri warna merah pada input
+                loginError.classList.remove("d-none");
+                usernameInput.classList.add("is-invalid");
+                passwordInput.classList.add("is-invalid");
+            }
+        })
+        .catch(err => {
+            console.error("Terjadi kesalahan sistem:", err);
+            alert("Gagal terhubung ke server backend. Pastikan server Node.js sudah dinyalakan!");
+        });
+    });
 });
 
-function togglePassword(){
+// Fungsi global untuk melihat/menyembunyikan password (tetap dipertahankan)
+window.togglePassword = function() {
+    const passwordField = document.getElementById("password");
+    const eyeIcon = document.getElementById("eyeIcon");
 
-    const passwordField =
-        document.getElementById("password");
+    if (!passwordField || !eyeIcon) return;
 
-    const eyeIcon =
-        document.getElementById("eyeIcon");
-
-    if(passwordField.type === "password"){
-
+    if (passwordField.type === "password") {
         passwordField.type = "text";
-
         eyeIcon.classList.remove("fa-eye");
         eyeIcon.classList.add("fa-eye-slash");
-
-    }
-    else{
-
+    } else {
         passwordField.type = "password";
-
         eyeIcon.classList.remove("fa-eye-slash");
         eyeIcon.classList.add("fa-eye");
-
     }
-
-}
+};
