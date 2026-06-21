@@ -1,0 +1,19 @@
+{
+  "users": [
+    { "id_user": 1, "username": "admin", "password": "admin123", "role": "admin" },
+    { "id_user": 2, "username": "anggota", "password": "anggota123", "role": "anggota" }
+  ],
+  "buku": [
+    {
+      "id_buku": 1,
+      "kode_buku": "BK-001",
+      "judul": "Laskar Pelangi",
+      "penulis": "Andrea Hirata",
+      "kategori": "Novel",
+      "stok": 5,
+      "lokasi_rak": "A1",
+      "status": "tersedia",
+      "sinopsis": "Novel tentang perjuangan anak-anak Belitung."
+    }
+  ]
+}
